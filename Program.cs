@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Linq;
-using System.Reflection;
-using System.Reflection.Emit;
 using EFCoreSandbox.Models;
 using Microsoft.EntityFrameworkCore;
 
@@ -23,14 +20,11 @@ namespace EFCoreSandbox
 
             DbContext dynDbContext = (DbContext) Activator.CreateInstance(dynDbContextType, builder.Options);
 
-
             dynDbContext.Add<Pet>(new Pet() {Name = "Daisy"});
 
-            dynDbContext.Add<Person>(new Person() { FirstName = "Dave" }); 
-            
+            dynDbContext.Add<Person>(new Person() {FirstName = "Dave"});
+
             dynDbContext.SaveChanges();
         }
-
-
     }
 }

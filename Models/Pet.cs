@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-
-namespace EFCoreSandbox.Models
+﻿namespace EFCoreSandbox.Models
 {
     public class Pet : BaseModel
     {
