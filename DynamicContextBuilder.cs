@@ -25,19 +25,29 @@ namespace EFCoreSandbox
 
             var baseConstructor = typeof(DbContext).GetConstructor(BindingFlags.Public | BindingFlags.FlattenHierarchy | BindingFlags.Instance, null, new Type[] { typeof(DbContextOptions) }, null);
 
+            //Set up the default constructor to call base
+            var defaultConstructor = typeBuilder.DefineConstructor(MethodAttributes.Public, CallingConventions.Standard, new Type[0] );
+            var defaultConstructorIl = defaultConstructor.GetILGenerator();
+            defaultConstructorIl.Emit(OpCodes.Ldarg_0);                // push "this";
+            defaultConstructorIl.Emit(OpCodes.Call, baseConstructor);
+            //The compiler always adds two nops
+            defaultConstructorIl.Emit(OpCodes.Nop);
+            defaultConstructorIl.Emit(OpCodes.Nop);
+            defaultConstructorIl.Emit(OpCodes.Ret);
 
-            //Set up the construct that passes the DB Context Options
-            var constructor = typeBuilder.DefineConstructor(MethodAttributes.Public, CallingConventions.Standard, new Type[] { typeof(DbContextOptions) });
 
-            var constructorIl = constructor.GetILGenerator();
+            //Set up the construct that passes the DB Context Options - change this section here if you're calling other overloads to DB context
+            var dbContextConstructor = typeBuilder.DefineConstructor(MethodAttributes.Public, CallingConventions.Standard, new Type[] { typeof(DbContextOptions) });
 
-            constructorIl.Emit(OpCodes.Ldarg_0);                // push "this";
-            constructorIl.Emit(OpCodes.Ldarg_1);                // push the 1st parameter
-            constructorIl.Emit(OpCodes.Call, baseConstructor);
-            //The compiler always adds two nops, not related to the two pushes above.
-            constructorIl.Emit(OpCodes.Nop);
-            constructorIl.Emit(OpCodes.Nop);
-            constructorIl.Emit(OpCodes.Ret);
+            var dbContextConstructorIl = dbContextConstructor.GetILGenerator();
+
+            dbContextConstructorIl.Emit(OpCodes.Ldarg_0);                // push "this";
+            dbContextConstructorIl.Emit(OpCodes.Ldarg_1);                // push the 1st parameter
+            dbContextConstructorIl.Emit(OpCodes.Call, baseConstructor);
+            //The compiler always adds two nops
+            dbContextConstructorIl.Emit(OpCodes.Nop);
+            dbContextConstructorIl.Emit(OpCodes.Nop);
+            dbContextConstructorIl.Emit(OpCodes.Ret);
 
             foreach (var modelType in modelTypes)
             {
